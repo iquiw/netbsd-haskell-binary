@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    env:
+      SHELLCHECK_VERSION : '0.9.0'
+
+    name: Build haskell binaries on NetBSD
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build binaries
+        uses: vmactions/netbsd-vm@v1
+        with:
+          prepare: |
+            /usr/sbin/pkg_add http://cdn.netbsd.org/pub/pkgsrc/packages/NetBSD/amd64/9.3/All/pkgin-23.8.1.tgz
+            /usr/pkg/bin/pkgin update
+            /usr/pkg/bin/pkgin -y install ghc cabal-install
+
+          run: |
+            cabal update
+            sh build.sh ShellCheck-${{ env.SHELLCHECK_VERSION }} shellcheck
+
+      - name: Debug
+        run: |
+          find . -type f
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: 'ShellCheck-${{ env.SHELLCHECK_VERSION }}.tar.gz'
+          artifactContentType: application/octet-stream
+          name: Haskell binary packages for NetBSD/amd64
+          body: |
+            * ShellCheck-${{ env.SHELLCHECK_VERSION }}
