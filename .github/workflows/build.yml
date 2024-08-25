@@ -7,9 +7,9 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
-      SHELLCHECK_VERSION : '0.9.0'
+      SHELLCHECK_VERSION : '0.10.0'
 
     name: Build haskell binaries on NetBSD
     steps:
@@ -20,7 +20,7 @@ jobs:
         uses: vmactions/netbsd-vm@v1
         with:
           prepare: |
-            /usr/sbin/pkg_add http://cdn.netbsd.org/pub/pkgsrc/packages/NetBSD/amd64/9.3/All/pkgin-23.8.1.tgz
+            /usr/sbin/pkg_add http://cdn.netbsd.org/pub/pkgsrc/packages/NetBSD/amd64/10.0/All/pkgin-23.8.1nb4.tgz
             /usr/pkg/bin/pkgin update
             /usr/pkg/bin/pkgin -y install ghc cabal-install
 
